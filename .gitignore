@@ -28,3 +28,7 @@ ipch/
 # ---- System ----
 .DS_Store
 Thumbs.db
+
+# ---- Keep SDL3 folder ----
+!SDL3/
+!SDL3/**
