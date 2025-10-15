@@ -1,0 +1,30 @@
+# ---- Visual Studio general ----
+.vs/
+*.VC.db
+*.VC.opendb
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# ---- Build output ----
+x64/
+x86/
+[Oo]bj/
+[Bb]in/
+Debug/
+Release/
+ipch/
+*.pdb
+*.exe
+*.log
+
+# ---- Backup / Temp ----
+*.tmp
+*.bak
+*.cache
+*.swp
+
+# ---- System ----
+.DS_Store
+Thumbs.db
