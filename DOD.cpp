@@ -2,10 +2,9 @@
 
 int main() {
     Game game;
-    if (!game.Init()) {
-        return 0;
+    if (game.Init()) {
+        game.Run();
     }
-    game.Run();
 
     return 0;
 }
