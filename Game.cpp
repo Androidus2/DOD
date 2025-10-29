@@ -1,5 +1,7 @@
 #include <iostream>
 #include "Game.h"
+#include "Utils.h"
+#include <SDL3_image/SDL_image.h>
 
 void Game::CalculateDeltaTime() {
     m_last = m_now;
@@ -12,27 +14,24 @@ void Game::HandleInput() {
     while (SDL_PollEvent(&m_event)) {
         if (m_event.type == SDL_EVENT_QUIT)
             m_running = false;
-
-        if (m_event.type == SDL_EVENT_KEY_DOWN) {
-            if (m_event.key.key == SDLK_SPACE) {
-                m_squareSpeed *= -1;
-            }
-        }
+        m_cam.HandleEvent(m_deltaTime, &m_event);
     }
 }
 void Game::Update() {
     CalculateDeltaTime();
-    m_square.x += m_squareSpeed * m_deltaTime;
+    std::cout <<  static_cast<int>(1.0f / m_deltaTime) << '\n';
 
-    int squareXInt = m_square.x;
-    m_squareBlue = squareXInt % 256;
+    for (int i = 0; i < m_gameObjects.size(); ++i)
+        m_gameObjects[i].Update(m_deltaTime);
+
+    Utils::ResolveCollisions(m_gameObjects);
 }
 void Game::Draw() const {
     SDL_SetRenderDrawColor(m_renderer, 0, 0, 0, 255);
     SDL_RenderClear(m_renderer);
 
-    SDL_SetRenderDrawColor(m_renderer, 120, 0, m_squareBlue, 255);
-    SDL_RenderFillRect(m_renderer, &m_square);
+    for (int i = 0; i < m_gameObjects.size(); ++i)
+        m_gameObjects[i].Draw(m_renderer, m_cam);
 
     SDL_RenderPresent(m_renderer);
 }
@@ -58,12 +57,21 @@ bool Game::Init() {
         return 0;
     }
 
+    m_circleTexture = IMG_LoadTexture(m_renderer, "circle.png");
+    if (!m_circleTexture) {
+        std::cerr << "Failed to load circle texture: " << SDL_GetError() << std::endl;
+        return 0;
+    }
+    SDL_SetTextureBlendMode(m_circleTexture, SDL_BLENDMODE_BLEND);
+
+    srand(time(NULL));
+
     m_now = SDL_GetPerformanceCounter();
     m_last = 0;
     m_deltaTime = 0;
 
-    m_squareSpeed = 100.f;
-    m_square = { -100.f, 250.f, 100.f, 100.f };
+    for (int i=0; i < 10000; i++)
+        m_gameObjects.push_back({ m_circleTexture, 5.0f });
     return 1;
 }
 void Game::Run() {
@@ -81,6 +89,9 @@ Game::~Game() {
     }
     if (m_renderer) {
         SDL_DestroyRenderer(m_renderer);
+    }
+    if (m_circleTexture) {
+        SDL_DestroyTexture(m_circleTexture);
     }
     SDL_Quit();
 }

@@ -1,5 +1,7 @@
 #pragma once
+#include <vector>
 #include <SDL3/SDL.h>
+#include "GameObject.h"
 
 class Game {
 private:
@@ -14,11 +16,9 @@ private:
     Uint64 m_last;
     double m_deltaTime;
 
-    // TODO: Move these to a generic scene container with some other classes
-    // "Game" specific variables
-    float m_squareSpeed;
-    SDL_FRect m_square;
-    Uint8 m_squareBlue;
+    SDL_Texture* m_circleTexture;
+    Camera m_cam;
+    std::vector<GameObject> m_gameObjects;
 
     void CalculateDeltaTime();
 
