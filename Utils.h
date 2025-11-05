@@ -18,4 +18,6 @@ public:
 
 	static void ResolveCollisions(int numberOfObjects, float* positionsX, float* positionsY, float* velocitiesX, float* velocitiesY, float* radiuses);
 	static void ResolveCollisions(std::vector<GameObject>& gameObjects);
+
+	static int GetCurrentMemoryUsage();
 };

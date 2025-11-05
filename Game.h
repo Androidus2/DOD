@@ -21,9 +21,10 @@ private:
     Uint64 m_last;
     double m_deltaTime;
 
-    // OOP simulation
     SDL_Texture* m_circleTexture;
     Camera m_cam;
+
+    // OOP simulation
     std::vector<GameObject> m_gameObjects;
 
     // DOD simulation
@@ -42,6 +43,7 @@ private:
 
     bool m_useOOP;
 
+    void _ResetDOD();
     void _UpdateDOD();
     void _DrawDOD();
 

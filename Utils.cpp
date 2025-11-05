@@ -1,4 +1,6 @@
 #include "Utils.h"
+#include <windows.h>
+#include <psapi.h>
 
 const int collisionIterations = 1;
 
@@ -104,4 +106,14 @@ void Utils::ResolveCollisions(std::vector<GameObject>& gameObjects) {
 			}
 		}
 	}
+}
+
+int Utils::GetCurrentMemoryUsage()
+{
+	PROCESS_MEMORY_COUNTERS_EX pmc;
+	if (GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc)))
+	{
+		return pmc.WorkingSetSize; // bytes currently in RAM
+	}
+	return 0;
 }
