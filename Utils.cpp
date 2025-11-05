@@ -14,42 +14,92 @@ float Utils::GenerateRandomFloat(float low, float high) {
 	return generated;
 }
 
-bool Utils::IsColliding(const GameObject& a, const GameObject& b) {
-	Vector2 diff = a.GetPostion() - b.GetPostion();
-	float distanceSquared = diff.x * diff.x + diff.y * diff.y;
-	float radiusSum = a.GetRadius() + b.GetRadius();
+bool Utils::_IsColliding(float aX, float aY, float aRadius, float bX, float bY, float bRadius) {
+	float xDiff = aX - bX;
+	float yDiff = aY - bY;
+	float distanceSquared = xDiff * xDiff + yDiff * yDiff;
+	float radiusSum = aRadius + bRadius;
 	return distanceSquared < radiusSum * radiusSum;
 }
-void Utils::ResolveCollision(GameObject& a, GameObject& b) {
-	Vector2 diff = b.GetPostion() - a.GetPostion();
-	float dist = diff.GetMagnitude();
+bool Utils::_IsColliding(const GameObject& a, const GameObject& b) {
+	return _IsColliding(a.GetPostion().x, a.GetPostion().y, a.GetRadius(), b.GetPostion().x, b.GetPostion().y, b.GetRadius());
+}
+
+void Utils::_ResolveCollision(float& aX, float& aY, float aRadius, float& bX, float& bY, float bRadius) {
+	float xDiff = aX - bX;
+	float yDiff = aY - bY;
+	float dist = Vector2{ xDiff, yDiff }.GetMagnitude();
 	if (dist == 0.0f)
 		return;
-	float overlap = a.GetRadius() + b.GetRadius() - dist;
-	if (overlap > 0.0f) {
-		Vector2 correction = diff.GetNormalized() * (overlap / 2.0f);
-		a.SetPosition(a.GetPostion() - correction);
-		b.SetPosition(b.GetPostion() + correction);
+	float overlap = aRadius + bRadius - dist;
+	float xCorrection = xDiff / dist * overlap / 2.0f;
+	float yCorrecttion = yDiff / dist * overlap / 2.0f;
+	aX -= xCorrection;
+	aY -= yCorrecttion;
+	bX += xCorrection;
+	bY -= yCorrecttion;
+}
+void Utils::_ResolveCollision(GameObject& a, GameObject& b) {
+	float aX = a.GetPostion().x;
+	float aY = a.GetPostion().y;
+
+	float bX = b.GetPostion().x;
+	float bY = b.GetPostion().y;
+
+	_ResolveCollision(aX, aY, a.GetRadius(), bX, bY, b.GetRadius());
+
+	a.SetPosition({ aX, aY });
+	b.SetPosition({ bX, bY });
+}
+
+void Utils::_SetVelocitiesAfterCollisionResolution(float aX, float aY, float& aVelX, float& aVelY, float bX, float bY, float& bVelX, float& bVelY) {
+	float dirX = bX - aX;
+	float dirY = bY - aY;
+	float dist = Vector2{ dirX, dirY }.GetMagnitude();
+	if (dist == 0.0f)
+		return;
+	dirX /= dist;
+	dirY /= dist;
+
+	float speedA = -(Vector2{ aVelX, aVelY }.GetMagnitude());
+	float speedB = Vector2{ bVelX, bVelY }.GetMagnitude();
+
+	aVelX = dirX * speedA;
+	aVelY = dirY * speedA;
+
+	bVelX = dirX * speedB;
+	bVelY = dirY * speedB;
+}
+void Utils::_SetVelocitiesAfterCollisionResolution(GameObject& a, GameObject& b) {
+	float aVelX = a.GetVelocity().x;
+	float aVelY = a.GetVelocity().y;
+	float bVelX = b.GetVelocity().x;
+	float bVelY = b.GetVelocity().y;
+	_SetVelocitiesAfterCollisionResolution(a.GetPostion().x, a.GetPostion().y, aVelX, aVelY, b.GetPostion().x, b.GetPostion().y, bVelX, bVelY);
+	a.SetVelocity({ aVelX, aVelY });
+	b.SetVelocity({ aVelX, bVelY });
+}
+
+void Utils::ResolveCollisions(int numberOfObjects, float* positionsX, float* positionsY, float* velocitiesX, float* velocitiesY, float* radiuses) {
+	for (int k = 0; k < collisionIterations; ++k) {
+		for (int i = 0; i < numberOfObjects; ++i) {
+			for (int j = i + 1; j < numberOfObjects; ++j) {
+				if (_IsColliding(positionsX[i], positionsY[i], radiuses[i], positionsX[j], positionsY[j], radiuses[j])) {
+					_ResolveCollision(positionsX[i], positionsY[i], radiuses[i], positionsX[j], positionsY[j], radiuses[j]);
+					_SetVelocitiesAfterCollisionResolution(positionsX[i], positionsY[i], velocitiesX[i], velocitiesY[i],
+						positionsX[j], positionsY[j], velocitiesX[j], velocitiesY[j]);
+				}
+			}
+		}
 	}
 }
-void Utils::SetVelocitiesAfterCollisionResolution(GameObject& a, GameObject& b) {
-	Vector2 dir = (b.GetPostion() - a.GetPostion()).GetNormalized();
-
-	float speedA = a.GetVelocity().GetMagnitude();
-	float speedB = b.GetVelocity().GetMagnitude();
-
-	a.SetVelocity(dir * -speedA);
-	b.SetVelocity(dir * speedB);
-}
-
-
 void Utils::ResolveCollisions(std::vector<GameObject>& gameObjects) {
 	for (int k = 0; k < collisionIterations; ++k) {
 		for (int i = 0; i < gameObjects.size(); ++i) {
 			for (int j = i + 1; j < gameObjects.size(); ++j) {
-				if (IsColliding(gameObjects[i], gameObjects[j])) {
-					ResolveCollision(gameObjects[i], gameObjects[j]);
-					SetVelocitiesAfterCollisionResolution(gameObjects[i], gameObjects[j]);
+				if (_IsColliding(gameObjects[i], gameObjects[j])) {
+					_ResolveCollision(gameObjects[i], gameObjects[j]);
+					_SetVelocitiesAfterCollisionResolution(gameObjects[i], gameObjects[j]);
 				}
 			}
 		}

@@ -36,6 +36,20 @@ void GameObject::SetVelocity(const Vector2& newVelocity) {
     m_velocity = newVelocity;
 }
 
+const SDL_Color& GameObject::GetColor() const {
+    return m_color;
+}
+void GameObject::SetColor(const SDL_Color& newColor) {
+    m_color = newColor;
+}
+
+const SDL_FRect& GameObject::GetRect() const {
+    return m_rect;
+}
+void GameObject::SetRect(const SDL_FRect& newRect) {
+    m_rect = newRect;
+}
+
 void GameObject::Update(float deltaTime) {
     if ((m_position.x < 0.0f && m_velocity.x < 0.0f) || (m_position.x > 5000.0f && m_velocity.x > 0.0f))
         m_velocity.x *= -1;

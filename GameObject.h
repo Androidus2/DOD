@@ -24,6 +24,12 @@ public:
 	const Vector2& GetVelocity() const;
 	void SetVelocity(const Vector2& newVelocity);
 
+	const SDL_Color& GetColor() const;
+	void SetColor(const SDL_Color& newColor);
+
+	const SDL_FRect& GetRect() const;
+	void SetRect(const SDL_FRect& newRect);
+
 	void Update(float deltaTime);
 	void Draw(SDL_Renderer* renderer, const Camera& cam) const;
 };
