@@ -10,6 +10,9 @@
 
 class Game {
 private:
+    int m_windowWidth;
+    int m_windowHeight;
+
     SDL_Window* m_window;
     SDL_Renderer* m_renderer;
     SDL_Event m_event;
@@ -58,5 +61,6 @@ private:
 public:
     bool Init();
     void Run();
+
     ~Game();
 };

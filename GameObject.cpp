@@ -1,5 +1,6 @@
 #include "GameObject.h"
 #include "Utils.h"
+#include "Game.h"
 
 GameObject::GameObject(SDL_Texture* texture, float radius) {
     m_texture = texture;
@@ -59,12 +60,12 @@ void GameObject::Update(float deltaTime) {
     SetPosition(m_position + m_velocity * deltaTime);
 }
 
-void GameObject::Draw(SDL_Renderer* renderer, const Camera& cam) const {
+void GameObject::Draw(SDL_Renderer* renderer, const Camera& cam, const Vector2& windowDimensions) const {
     if (!m_texture) return;
 
     SDL_FRect screenRect = cam.worldToScreenCoordinates(m_rect);
 
-    if (screenRect.x + screenRect.w < 0 || screenRect.x > 800 || screenRect.y + screenRect.h < 0 || screenRect.y > 600)
+    if (screenRect.x + screenRect.w < 0 || screenRect.x > windowDimensions.x || screenRect.y + screenRect.h < 0 || screenRect.y > windowDimensions.y)
         return;
 
     SDL_SetTextureColorMod(m_texture, m_color.r, m_color.g, m_color.b);

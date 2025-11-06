@@ -31,5 +31,5 @@ public:
 	void SetRect(const SDL_FRect& newRect);
 
 	void Update(float deltaTime);
-	void Draw(SDL_Renderer* renderer, const Camera& cam) const;
+	void Draw(SDL_Renderer* renderer, const Camera& cam, const Vector2& windowDimensions) const;
 };

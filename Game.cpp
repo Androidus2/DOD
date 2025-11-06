@@ -59,7 +59,7 @@ void Game::_DrawDOD() {
     for (int i = 0; i < m_numberOfObjects; ++i) {
         SDL_FRect screenRect = m_cam.worldToScreenCoordinates(m_dodRects[i]);
 
-        if (screenRect.x + screenRect.w < 0 || screenRect.x > 800 || screenRect.y + screenRect.h < 0 || screenRect.y > 600)
+        if (screenRect.x + screenRect.w < 0 || screenRect.x > m_windowWidth || screenRect.y + screenRect.h < 0 || screenRect.y > m_windowHeight)
             continue;
 
         SDL_SetTextureColorMod(m_circleTexture, m_dodColors[i].r, m_dodColors[i].g, m_dodColors[i].b);
@@ -150,6 +150,9 @@ void Game::_HandleInput() {
         if (m_event.type == SDL_EVENT_QUIT)
             m_running = false;
 
+        if(m_event.type == SDL_EVENT_WINDOW_RESIZED)
+            SDL_GetWindowSize(m_window, &m_windowWidth, &m_windowHeight);
+
         m_cam.HandleEvent(m_deltaTime, &m_event);
     }
 }
@@ -175,8 +178,9 @@ void Game::_Draw() {
     SDL_RenderClear(m_renderer);
 
     if (m_useOOP) {
+        Vector2 windowDimensions{ m_windowWidth, m_windowHeight };
         for (int i = 0; i < m_gameObjects.size(); ++i)
-            m_gameObjects[i].Draw(m_renderer, m_cam);
+            m_gameObjects[i].Draw(m_renderer, m_cam, windowDimensions);
     }
     else {
         _DrawDOD();
@@ -207,12 +211,15 @@ void Game::_Draw() {
 }
 
 bool Game::Init() {
+    m_windowHeight = 600;
+    m_windowWidth = 800;
+
     if (!SDL_Init(SDL_INIT_VIDEO)) {
         std::cerr << "SDL_Init Error: " << SDL_GetError() << "\n";
         return 0;
     }
 
-    m_window = SDL_CreateWindow("DOD Engine", 800, 600, SDL_WINDOW_RESIZABLE);
+    m_window = SDL_CreateWindow("DOD Engine", m_windowWidth, m_windowHeight, SDL_WINDOW_RESIZABLE);
     if (!m_window) {
         std::cerr << "SDL_CreateWindow Error: " << SDL_GetError() << "\n";
         SDL_Quit();
