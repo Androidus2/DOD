@@ -59,6 +59,9 @@ void Game::_DrawDOD() {
     for (int i = 0; i < m_numberOfObjects; ++i) {
         SDL_FRect screenRect = m_cam.worldToScreenCoordinates(m_dodRects[i]);
 
+        if (screenRect.x + screenRect.w < 0 || screenRect.x > 800 || screenRect.y + screenRect.h < 0 || screenRect.y > 600)
+            continue;
+
         SDL_SetTextureColorMod(m_circleTexture, m_dodColors[i].r, m_dodColors[i].g, m_dodColors[i].b);
 
         SDL_RenderTexture(m_renderer, m_circleTexture, nullptr, &screenRect);

@@ -64,6 +64,9 @@ void GameObject::Draw(SDL_Renderer* renderer, const Camera& cam) const {
 
     SDL_FRect screenRect = cam.worldToScreenCoordinates(m_rect);
 
+    if (screenRect.x + screenRect.w < 0 || screenRect.x > 800 || screenRect.y + screenRect.h < 0 || screenRect.y > 600)
+        return;
+
     SDL_SetTextureColorMod(m_texture, m_color.r, m_color.g, m_color.b);
 
     SDL_RenderTexture(renderer, m_texture, nullptr, &screenRect);
