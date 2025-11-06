@@ -82,7 +82,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>SDL3.lib;SDL3_image.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Users\alexa\Documents\Alex\Facultate\An3\Sem1\DOD\DOD\SDL3_image-3.2.4\lib\x86;$(ProjectDir)SDL3\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)SDL3_image-3.2.4\lib\x86;$(ProjectDir)SDL3\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>copy "$(ProjectDir)SDL3\lib\x86\SDL3.dll" "$(OutDir)"
@@ -103,7 +103,7 @@ copy "$(ProjectDir)SDL3_image-3.2.4\lib\x86\SDL3_image.dll" "$(OutDir)"</Command
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>SDL3.lib;SDL3_image.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Users\alexa\Documents\Alex\Facultate\An3\Sem1\DOD\DOD\SDL3_image-3.2.4\lib\x86;$(ProjectDir)SDL3\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)SDL3_image-3.2.4\lib\x86;$(ProjectDir)SDL3\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>copy "$(ProjectDir)SDL3\lib\x86\SDL3.dll" "$(OutDir)"
@@ -121,7 +121,7 @@ copy "$(ProjectDir)SDL3_image-3.2.4\lib\x86\SDL3_image.dll" "$(OutDir)"</Command
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Users\alexa\Documents\Alex\Facultate\An3\Sem1\DOD\DOD\SDL3_image-3.2.4\lib\x64;$(ProjectDir)SDL3\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)SDL3_image-3.2.4\lib\x64;$(ProjectDir)SDL3\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>SDL3.lib;SDL3_image.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
@@ -142,7 +142,7 @@ copy "$(ProjectDir)SDL3_image-3.2.4\lib\x64\SDL3_image.dll" "$(OutDir)"</Command
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Users\alexa\Documents\Alex\Facultate\An3\Sem1\DOD\DOD\SDL3_image-3.2.4\lib\x64;$(ProjectDir)SDL3\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)SDL3_image-3.2.4\lib\x64;$(ProjectDir)SDL3\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>SDL3.lib;SDL3_image.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
