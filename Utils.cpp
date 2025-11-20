@@ -1,8 +1,7 @@
 #include "Utils.h"
+#include "Constants.h"
 #include <windows.h>
 #include <psapi.h>
-
-const int collisionIterations = 1;
 
 SDL_Color Utils::GenerateRandomColor() {
 	Uint8 r = static_cast<Uint8>(rand() % 256);
@@ -28,8 +27,8 @@ bool Utils::_IsColliding(const GameObject& a, const GameObject& b) {
 }
 
 void Utils::_ResolveCollision(float& aX, float& aY, float aRadius, float& bX, float& bY, float bRadius) {
-	float xDiff = aX - bX;
-	float yDiff = aY - bY;
+	float xDiff = bX - aX;
+	float yDiff = bY - aY;
 	float dist = Vector2{ xDiff, yDiff }.GetMagnitude();
 	if (dist == 0.0f)
 		return;
@@ -39,7 +38,7 @@ void Utils::_ResolveCollision(float& aX, float& aY, float aRadius, float& bX, fl
 	aX -= xCorrection;
 	aY -= yCorrecttion;
 	bX += xCorrection;
-	bY -= yCorrecttion;
+	bY += yCorrecttion;
 }
 void Utils::_ResolveCollision(GameObject& a, GameObject& b) {
 	float aX = a.GetPostion().x;

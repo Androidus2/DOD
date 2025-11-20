@@ -1,7 +1,6 @@
 #include "Camera.h"
+#include "Constants.h"
 
-const float panSpeed = 300.0f;
-const float zoomSpeed = 1.2f;
 
 Camera::Camera() {
 	m_zoom = 1.0f;

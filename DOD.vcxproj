@@ -166,6 +166,7 @@ copy "$(ProjectDir)SDL3_image-3.2.4\lib\x64\SDL3_image.dll" "$(OutDir)"</Command
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="Constants.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Utils.h" />

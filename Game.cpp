@@ -1,8 +1,8 @@
 #include <iostream>
 #include "Game.h"
 #include "Utils.h"
+#include "Constants.h"
 
-const int maxObjectCount = 100000;
 
 void Game::_CalculateDeltaTime() {
     m_last = m_now;
@@ -43,9 +43,9 @@ void Game::_ResetDOD() {
 }
 void Game::_UpdateDOD() {
     for (int i = 0; i < m_numberOfObjects; ++i) {
-        if ((m_dodPositionsX[i] < 0.0f && m_dodVelocitiesX[i] < 0.0f) || (m_dodPositionsX[i] > 5000.0f && m_dodVelocitiesX[i] > 0.0f))
+        if ((m_dodPositionsX[i] < 0.0f && m_dodVelocitiesX[i] < 0.0f) || (m_dodPositionsX[i] > mapSize && m_dodVelocitiesX[i] > 0.0f))
             m_dodVelocitiesX[i] *= -1;
-        if ((m_dodPositionsY[i] < 0.0f && m_dodVelocitiesY[i] < 0.0f) || (m_dodPositionsY[i] > 5000.0f && m_dodVelocitiesY[i] > 0.0f))
+        if ((m_dodPositionsY[i] < 0.0f && m_dodVelocitiesY[i] < 0.0f) || (m_dodPositionsY[i] > mapSize && m_dodVelocitiesY[i] > 0.0f))
             m_dodVelocitiesY[i] *= -1;
 
         m_dodPositionsX[i] += m_dodVelocitiesX[i] * m_deltaTime;
@@ -96,8 +96,8 @@ void Game::_SwitchToDOD() {
         }
         else {
             // The other maxObjectCount - m_numberOfObjects objects need to be generated
-            m_dodPositionsX[i] = Utils::GenerateRandomFloat(0.0f, 5000.0f);
-            m_dodPositionsY[i] = Utils::GenerateRandomFloat(0.0f, 5000.0f);
+            m_dodPositionsX[i] = Utils::GenerateRandomFloat(0.0f, mapSize);
+            m_dodPositionsY[i] = Utils::GenerateRandomFloat(0.0f, mapSize);
 
             m_dodVelocitiesX[i] = Utils::GenerateRandomFloat(-100.0f, 100.0f);
             m_dodVelocitiesY[i] = Utils::GenerateRandomFloat(-100.0f, 100.0f);

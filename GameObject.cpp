@@ -1,13 +1,14 @@
 #include "GameObject.h"
 #include "Utils.h"
 #include "Game.h"
+#include "Constants.h"
 
 GameObject::GameObject(SDL_Texture* texture, float radius) {
     m_texture = texture;
     m_radius = radius;
 
-    m_position.x = Utils::GenerateRandomFloat(0.0f, 5000.0f);
-    m_position.y = Utils::GenerateRandomFloat(0.0f, 5000.0f);
+    m_position.x = Utils::GenerateRandomFloat(0.0f, mapSize);
+    m_position.y = Utils::GenerateRandomFloat(0.0f, mapSize);
 
     m_velocity.x = Utils::GenerateRandomFloat(-100.0f, 100.0f);
     m_velocity.y = Utils::GenerateRandomFloat(-100.0f, 100.0f);
@@ -52,9 +53,9 @@ void GameObject::SetRect(const SDL_FRect& newRect) {
 }
 
 void GameObject::Update(float deltaTime) {
-    if ((m_position.x < 0.0f && m_velocity.x < 0.0f) || (m_position.x > 5000.0f && m_velocity.x > 0.0f))
+    if ((m_position.x < 0.0f && m_velocity.x < 0.0f) || (m_position.x > mapSize && m_velocity.x > 0.0f))
         m_velocity.x *= -1;
-    if ((m_position.y < 0.0f && m_velocity.y < 0.0f) || (m_position.y > 5000.0f && m_velocity.y > 0.0f))
+    if ((m_position.y < 0.0f && m_velocity.y < 0.0f) || (m_position.y > mapSize && m_velocity.y > 0.0f))
         m_velocity.y *= -1;
 
     SetPosition(m_position + m_velocity * deltaTime);
