@@ -153,11 +153,12 @@ void Game::_HandleInput() {
         if(m_event.type == SDL_EVENT_WINDOW_RESIZED)
             SDL_GetWindowSize(m_window, &m_windowWidth, &m_windowHeight);
 
-        m_cam.HandleEvent(m_deltaTime, &m_event);
+        m_cam.HandleEvent(&m_event);
     }
 }
 void Game::_Update() {
     _CalculateDeltaTime();
+    m_cam.Update(m_deltaTime);
 
     if (m_useOOP) {
         for (int i = 0; i < m_gameObjects.size(); ++i)
