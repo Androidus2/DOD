@@ -14,12 +14,13 @@ class GameObject {
 	SDL_Texture* m_texture;
 
 public:
-	GameObject(SDL_Texture* texture, float radius);
+	GameObject(SDL_Texture* texture);
 
 	const Vector2& GetPostion() const;
 	void SetPosition(const Vector2& newPosition);
 
 	float GetRadius() const;
+	void SetRadius(float radius);
 
 	const Vector2& GetVelocity() const;
 	void SetVelocity(const Vector2& newVelocity);

@@ -26,20 +26,41 @@ bool Utils::_IsColliding(const GameObject& a, const GameObject& b) {
 	return _IsColliding(a.GetPostion().x, a.GetPostion().y, a.GetRadius(), b.GetPostion().x, b.GetPostion().y, b.GetRadius());
 }
 
-void Utils::_ResolveCollision(float& aX, float& aY, float aRadius, float& bX, float& bY, float bRadius) {
-	float xDiff = bX - aX;
-	float yDiff = bY - aY;
-	float dist = Vector2{ xDiff, yDiff }.GetMagnitude();
-	if (dist == 0.0f)
+void Utils::_ResolveCollision(float& ax, float& ay, float ar,
+	float& bx, float& by, float br)
+{
+	float dx = bx - ax;
+	float dy = by - ay;
+	float dist = sqrt(dx * dx + dy * dy);
+
+	if (dist < 0.000001f) {
+		// Avoid divide by zero: give a tiny separation
+		dx = 0.00001f;
+		dy = 0.0f;
+		dist = 0.00001f;
+	}
+
+	float overlap = (ar + br) - dist;
+	if (overlap <= 0) 
 		return;
-	float overlap = aRadius + bRadius - dist;
-	float xCorrection = xDiff / dist * overlap / 2.0f;
-	float yCorrecttion = yDiff / dist * overlap / 2.0f;
-	aX -= xCorrection;
-	aY -= yCorrecttion;
-	bX += xCorrection;
-	bY += yCorrecttion;
+
+	float nx = dx / dist;
+	float ny = dy / dist;
+
+	// weight the correction by inverse radius (or mass)
+	float wA = 1.0f / ar;
+	float wB = 1.0f / br;
+	float wSum = wA + wB;
+
+	float moveA = overlap * (wA / wSum);
+	float moveB = overlap * (wB / wSum);
+
+	ax -= nx * moveA;
+	ay -= ny * moveA;
+	bx += nx * moveB;
+	by += ny * moveB;
 }
+
 void Utils::_ResolveCollision(GameObject& a, GameObject& b) {
 	float aX = a.GetPostion().x;
 	float aY = a.GetPostion().y;
@@ -53,32 +74,54 @@ void Utils::_ResolveCollision(GameObject& a, GameObject& b) {
 	b.SetPosition({ bX, bY });
 }
 
-void Utils::_SetVelocitiesAfterCollisionResolution(float aX, float aY, float& aVelX, float& aVelY, float bX, float bY, float& bVelX, float& bVelY) {
-	float dirX = bX - aX;
-	float dirY = bY - aY;
-	float dist = Vector2{ dirX, dirY }.GetMagnitude();
-	if (dist == 0.0f)
+void Utils::_SetVelocitiesAfterCollisionResolution(
+	float aX, float aY, float& aVelX, float& aVelY, float aRadius,
+	float bX, float bY, float& bVelX, float& bVelY, float bRadius)
+{
+	// Treat radius as mass
+	float mA = aRadius;
+	float mB = bRadius;
+
+	// Collision normal
+	float nx = bX - aX;
+	float ny = bY - aY;
+	float dist = sqrt(nx * nx + ny * ny);
+	if (dist < 0.000001f) 
 		return;
-	dirX /= dist;
-	dirY /= dist;
 
-	float speedA = -(Vector2{ aVelX, aVelY }.GetMagnitude());
-	float speedB = Vector2{ bVelX, bVelY }.GetMagnitude();
+	nx /= dist;
+	ny /= dist;
 
-	aVelX = dirX * speedA;
-	aVelY = dirY * speedA;
+	// Velocity components along the collision normal
+	float va = aVelX * nx + aVelY * ny;
+	float vb = bVelX * nx + bVelY * ny;
 
-	bVelX = dirX * speedB;
-	bVelY = dirY * speedB;
+	// If they are separating, no need to resolve
+	if (va - vb <= 0.0f) 
+		return;
+
+	// 1D elastic collision formula
+	float newVa = (va * (mA - mB) + 2 * mB * vb) / (mA + mB);
+	float newVb = (vb * (mB - mA) + 2 * mA * va) / (mA + mB);
+
+	// Convert scalar normal impulses back into 2D velocities
+	float impulseA = newVa - va;
+	float impulseB = newVb - vb;
+
+	aVelX += impulseA * nx;
+	aVelY += impulseA * ny;
+
+	bVelX += impulseB * nx;
+	bVelY += impulseB * ny;
 }
 void Utils::_SetVelocitiesAfterCollisionResolution(GameObject& a, GameObject& b) {
 	float aVelX = a.GetVelocity().x;
 	float aVelY = a.GetVelocity().y;
 	float bVelX = b.GetVelocity().x;
 	float bVelY = b.GetVelocity().y;
-	_SetVelocitiesAfterCollisionResolution(a.GetPostion().x, a.GetPostion().y, aVelX, aVelY, b.GetPostion().x, b.GetPostion().y, bVelX, bVelY);
+	_SetVelocitiesAfterCollisionResolution(a.GetPostion().x, a.GetPostion().y, aVelX, aVelY, a.GetRadius(), b.GetPostion().x, b.GetPostion().y, bVelX, bVelY, b.GetRadius());
 	a.SetVelocity({ aVelX, aVelY });
-	b.SetVelocity({ aVelX, bVelY });
+	b.SetVelocity({ bVelX, bVelY });
 }
 
 void Utils::ResolveCollisions(int numberOfObjects, float* positionsX, float* positionsY, float* velocitiesX, float* velocitiesY, float* radiuses) {
@@ -87,8 +130,8 @@ void Utils::ResolveCollisions(int numberOfObjects, float* positionsX, float* pos
 			for (int j = i + 1; j < numberOfObjects; ++j) {
 				if (_IsColliding(positionsX[i], positionsY[i], radiuses[i], positionsX[j], positionsY[j], radiuses[j])) {
 					_ResolveCollision(positionsX[i], positionsY[i], radiuses[i], positionsX[j], positionsY[j], radiuses[j]);
-					_SetVelocitiesAfterCollisionResolution(positionsX[i], positionsY[i], velocitiesX[i], velocitiesY[i],
-						positionsX[j], positionsY[j], velocitiesX[j], velocitiesY[j]);
+					_SetVelocitiesAfterCollisionResolution(positionsX[i], positionsY[i], velocitiesX[i], velocitiesY[i], radiuses[i],
+						positionsX[j], positionsY[j], velocitiesX[j], velocitiesY[j], radiuses[j]);
 				}
 			}
 		}

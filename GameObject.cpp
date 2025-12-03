@@ -3,9 +3,9 @@
 #include "Game.h"
 #include "Constants.h"
 
-GameObject::GameObject(SDL_Texture* texture, float radius) {
+GameObject::GameObject(SDL_Texture* texture) {
     m_texture = texture;
-    m_radius = radius;
+    m_radius = Utils::GenerateRandomFloat(1.0f, 10.0f);;
 
     m_position.x = Utils::GenerateRandomFloat(0.0f, mapSize);
     m_position.y = Utils::GenerateRandomFloat(0.0f, mapSize);
@@ -13,7 +13,7 @@ GameObject::GameObject(SDL_Texture* texture, float radius) {
     m_velocity.x = Utils::GenerateRandomFloat(-100.0f, 100.0f);
     m_velocity.y = Utils::GenerateRandomFloat(-100.0f, 100.0f);
 
-    m_rect = { 0.0f, 0.0f, radius * 2, radius * 2};
+    m_rect = { 0.0f, 0.0f, m_radius * 2, m_radius * 2};
     m_color = Utils::GenerateRandomColor();
 }
 
@@ -29,6 +29,12 @@ void GameObject::SetPosition(const Vector2& newPosition) {
 
 float GameObject::GetRadius() const {
     return m_radius;
+}
+void GameObject::SetRadius(float radius) {
+    m_radius = radius;
+
+    m_rect.h = radius * 2;
+    m_rect.w = radius * 2;
 }
 
 const Vector2& GameObject::GetVelocity() const {
@@ -50,6 +56,8 @@ const SDL_FRect& GameObject::GetRect() const {
 }
 void GameObject::SetRect(const SDL_FRect& newRect) {
     m_rect = newRect;
+
+    m_radius = m_rect.w / 2;
 }
 
 void GameObject::Update(float deltaTime) {

@@ -102,7 +102,7 @@ void Game::_SwitchToDOD() {
             m_dodVelocitiesX[i] = Utils::GenerateRandomFloat(-100.0f, 100.0f);
             m_dodVelocitiesY[i] = Utils::GenerateRandomFloat(-100.0f, 100.0f);
 
-            m_dodRadiuses[i] = 5.0f;
+            m_dodRadiuses[i] = Utils::GenerateRandomFloat(1.0f, 10.0f);
 
             m_dodRects[i] = { 0.0f, 0.0f, m_dodRadiuses[i] * 2, m_dodRadiuses[i] * 2 };
             m_dodColors[i] = Utils::GenerateRandomColor();
@@ -114,7 +114,7 @@ void Game::_SwitchToDOD() {
 void Game::_SwitchToOOP() {
     m_gameObjects.clear();
     for (int i = 0; i < m_numberOfObjects; ++i) {
-        GameObject newObject{ m_circleTexture, m_dodRadiuses[i] };
+        GameObject newObject{ m_circleTexture };
         newObject.SetPosition(Vector2{ m_dodPositionsX[i], m_dodPositionsY[i] });
         newObject.SetVelocity(Vector2{ m_dodVelocitiesX[i], m_dodVelocitiesY[i] });
         newObject.SetColor(m_dodColors[i]);
@@ -138,7 +138,7 @@ void Game::_HandleInput() {
             else {
                 int difference = m_numberOfObjects - m_gameObjects.size();
                 for (int i = 0; i < difference; ++i) {
-                    m_gameObjects.push_back(GameObject{ m_circleTexture, 5.0f });
+                    m_gameObjects.push_back(GameObject{ m_circleTexture });
                 }
             }
         }
@@ -260,7 +260,7 @@ bool Game::Init() {
     m_useOOP = true;
 
     for (int i = 0; i < m_numberOfObjects; i++)
-        m_gameObjects.push_back(GameObject{ m_circleTexture, 5.0f });
+        m_gameObjects.push_back(GameObject{ m_circleTexture });
 
     if (!m_useOOP)
         _SwitchToDOD();
