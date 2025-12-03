@@ -5,13 +5,13 @@
 
 GameObject::GameObject(SDL_Texture* texture) {
     m_texture = texture;
-    m_radius = Utils::GenerateRandomFloat(1.0f, 10.0f);;
+    m_radius = Utils::GenerateRandomFloat(minimumBallRadius, maximumBallRadius);
 
     m_position.x = Utils::GenerateRandomFloat(0.0f, mapSize);
     m_position.y = Utils::GenerateRandomFloat(0.0f, mapSize);
 
-    m_velocity.x = Utils::GenerateRandomFloat(-100.0f, 100.0f);
-    m_velocity.y = Utils::GenerateRandomFloat(-100.0f, 100.0f);
+    m_velocity.x = Utils::GenerateRandomFloat(-maximumBallVelocity, maximumBallVelocity);
+    m_velocity.y = Utils::GenerateRandomFloat(-maximumBallVelocity, maximumBallVelocity);
 
     m_rect = { 0.0f, 0.0f, m_radius * 2, m_radius * 2};
     m_color = Utils::GenerateRandomColor();

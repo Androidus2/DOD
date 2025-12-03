@@ -99,10 +99,10 @@ void Game::_SwitchToDOD() {
             m_dodPositionsX[i] = Utils::GenerateRandomFloat(0.0f, mapSize);
             m_dodPositionsY[i] = Utils::GenerateRandomFloat(0.0f, mapSize);
 
-            m_dodVelocitiesX[i] = Utils::GenerateRandomFloat(-100.0f, 100.0f);
-            m_dodVelocitiesY[i] = Utils::GenerateRandomFloat(-100.0f, 100.0f);
+            m_dodVelocitiesX[i] = Utils::GenerateRandomFloat(-maximumBallVelocity, maximumBallVelocity);
+            m_dodVelocitiesY[i] = Utils::GenerateRandomFloat(-maximumBallVelocity, maximumBallVelocity);
 
-            m_dodRadiuses[i] = Utils::GenerateRandomFloat(1.0f, 10.0f);
+            m_dodRadiuses[i] = Utils::GenerateRandomFloat(minimumBallRadius, maximumBallRadius);
 
             m_dodRects[i] = { 0.0f, 0.0f, m_dodRadiuses[i] * 2, m_dodRadiuses[i] * 2 };
             m_dodColors[i] = Utils::GenerateRandomColor();

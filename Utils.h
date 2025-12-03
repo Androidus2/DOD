@@ -3,9 +3,12 @@
 #include <vector>
 #include <SDL3/SDL.h>
 #include "GameObject.h"
+#include "Constants.h"
 
 class Utils {
 private:
+	static std::vector<int> grid[gridLength * gridLength];
+
 	static bool _IsColliding(float aX, float aY, float aRadius, float bX, float bY, float bRadius);
 	static bool _IsColliding(const GameObject& a, const GameObject& b);
 	static void _ResolveCollision(float& aX, float& aY, float aRadius, float& bX, float& bY, float bRadius);

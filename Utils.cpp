@@ -2,6 +2,12 @@
 #include "Constants.h"
 #include <windows.h>
 #include <psapi.h>
+#include <cmath>
+#include <algorithm>
+#include <omp.h>
+
+
+std::vector<int> Utils::grid[gridLength * gridLength];
 
 SDL_Color Utils::GenerateRandomColor() {
 	Uint8 r = static_cast<Uint8>(rand() % 256);
@@ -96,10 +102,6 @@ void Utils::_SetVelocitiesAfterCollisionResolution(
 	float va = aVelX * nx + aVelY * ny;
 	float vb = bVelX * nx + bVelY * ny;
 
-	// If they are separating, no need to resolve
-	if (va - vb <= 0.0f) 
-		return;
-
 	// 1D elastic collision formula
 	float newVa = (va * (mA - mB) + 2 * mB * vb) / (mA + mB);
 	float newVb = (vb * (mB - mA) + 2 * mA * va) / (mA + mB);
@@ -124,19 +126,92 @@ void Utils::_SetVelocitiesAfterCollisionResolution(GameObject& a, GameObject& b)
 	b.SetVelocity({ bVelX, bVelY });
 }
 
-void Utils::ResolveCollisions(int numberOfObjects, float* positionsX, float* positionsY, float* velocitiesX, float* velocitiesY, float* radiuses) {
+void Utils::ResolveCollisions(
+	int numberOfObjects, float* posX, float* posY,
+	float* velX, float* velY, float* radiuses)
+{
+	// If we want higher accuracy for the collisions
+	// But I want to get as many balls as possible so I'll leave the number of iterations at 1
 	for (int k = 0; k < collisionIterations; ++k) {
-		for (int i = 0; i < numberOfObjects; ++i) {
-			for (int j = i + 1; j < numberOfObjects; ++j) {
-				if (_IsColliding(positionsX[i], positionsY[i], radiuses[i], positionsX[j], positionsY[j], radiuses[j])) {
-					_ResolveCollision(positionsX[i], positionsY[i], radiuses[i], positionsX[j], positionsY[j], radiuses[j]);
-					_SetVelocitiesAfterCollisionResolution(positionsX[i], positionsY[i], velocitiesX[i], velocitiesY[i], radiuses[i],
-						positionsX[j], positionsY[j], velocitiesX[j], velocitiesY[j], radiuses[j]);
+		// Clear grid buckets
+		for (int i = 0; i < gridLength * gridLength; i++)
+			grid[i].clear();
+
+		// Insert objects into their grid cells
+		for (int i = 0; i < numberOfObjects; ++i)
+		{
+			int cx = std::clamp(int(posX[i] / gridCellSize), 0, gridLength - 1);
+			int cy = std::clamp(int(posY[i] / gridCellSize), 0, gridLength - 1);
+			int cellIndex = cy * gridLength + cx;
+			grid[cellIndex].push_back(i);
+		}
+
+		// Offsets to only check right and bottom neighbors
+		const int neighborOffsetsX[3] = { 0, 1, 1 };
+		const int neighborOffsetsY[3] = { 1, 0, 1 };
+
+		// Iterate over each cell
+		#pragma omp parallel for schedule(dynamic)
+		for (int y = 0; y < gridLength; y++)
+		{
+			for (int x = 0; x < gridLength; x++)
+			{
+				int baseIndex = y * gridLength + x;
+				auto& bucket = grid[baseIndex];
+
+				// Same cell
+				for (int i = 0; i < bucket.size(); i++)
+				{
+					int indA = bucket[i];
+					for (int j = i + 1; j < bucket.size(); j++)
+					{
+						int indB = bucket[j];
+						if (_IsColliding(posX[indA], posY[indA], radiuses[indA],
+							posX[indB], posY[indB], radiuses[indB]))
+						{
+							_SetVelocitiesAfterCollisionResolution(
+								posX[indA], posY[indA], velX[indA], velY[indA], radiuses[indA],
+								posX[indB], posY[indB], velX[indB], velY[indB], radiuses[indB]);
+
+							_ResolveCollision(posX[indA], posY[indA], radiuses[indA],
+								posX[indB], posY[indB], radiuses[indB]);
+						}
+					}
+				}
+
+				// Right and bottom cells
+				for (int k = 0; k < 3; k++)
+				{
+					int nx = x + neighborOffsetsX[k];
+					int ny = y + neighborOffsetsY[k];
+					if (nx >= gridLength || ny >= gridLength)
+						continue;
+
+					int neighborIndex = ny * gridLength + nx;
+					auto& neighborBucket = grid[neighborIndex];
+
+					for (int indA : bucket)
+					{
+						for (int indB : neighborBucket)
+						{
+							if (_IsColliding(posX[indA], posY[indA], radiuses[indA],
+								posX[indB], posY[indB], radiuses[indB]))
+							{
+								_SetVelocitiesAfterCollisionResolution(
+									posX[indA], posY[indA], velX[indA], velY[indA], radiuses[indA],
+									posX[indB], posY[indB], velX[indB], velY[indB], radiuses[indB]);
+
+								_ResolveCollision(posX[indA], posY[indA], radiuses[indA],
+									posX[indB], posY[indB], radiuses[indB]);
+							}
+						}
+					}
 				}
 			}
 		}
 	}
 }
+
 void Utils::ResolveCollisions(std::vector<GameObject>& gameObjects) {
 	for (int k = 0; k < collisionIterations; ++k) {
 		for (int i = 0; i < gameObjects.size(); ++i) {
